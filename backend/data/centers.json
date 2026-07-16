@@ -1,0 +1,38 @@
+[
+  {
+    "_id": "q7cndw1nk",
+    "name": "GreenTech Recycling Hub",
+    "address": "Building 12, Tech Park Avenue, Kakkanad, Kochi",
+    "operatingHours": "Mon - Sat: 9:00 AM - 6:00 PM",
+    "phone": "+91 98765 43210",
+    "coordinates": {
+      "lat": 10.0159,
+      "lng": 76.3419
+    },
+    "createdAt": "2026-07-16T18:22:12.843Z"
+  },
+  {
+    "_id": "hwsr322x7",
+    "name": "Eco-Cycle E-Waste Point",
+    "address": "MG Road, Near Metro Station, Ernakulam",
+    "operatingHours": "Mon - Fri: 10:00 AM - 7:00 PM",
+    "phone": "+91 98765 43211",
+    "coordinates": {
+      "lat": 9.9763,
+      "lng": 76.2798
+    },
+    "createdAt": "2026-07-16T18:22:12.847Z"
+  },
+  {
+    "_id": "hsuwi9r51",
+    "name": "Global Electronic Waste Depot",
+    "address": "Industrial Area, Phase II, Kalamassery",
+    "operatingHours": "Mon - Sat: 8:00 AM - 5:00 PM",
+    "phone": "+91 98765 43212",
+    "coordinates": {
+      "lat": 10.0543,
+      "lng": 76.3218
+    },
+    "createdAt": "2026-07-16T18:22:12.847Z"
+  }
+]
