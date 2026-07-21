@@ -1,20 +1,20 @@
 [
   {
-    "_id": "7pevjnbv4",
+    "_id": "zk5txez9q",
     "name": "Eco Admin",
     "email": "admin@ewaste.com",
-    "password": "$2a$10$DtDu.A92wwkLfcRdbcsyt.E7m1C2z3LAa4iVmOjdiGqQVX1SkdgaS",
+    "password": "$2a$10$LwfyJrfjJa9En4Df7U2.0ejWwPGGo12YXETpJrEcp1QqsY5Zty4Ri",
     "role": "admin",
     "ecoPoints": 0,
-    "createdAt": "2026-07-16T18:22:12.914Z"
+    "createdAt": "2026-07-21T17:41:11.660Z"
   },
   {
-    "_id": "wfwhhqkpx",
+    "_id": "sqcq2snh9",
     "name": "John Doe",
     "email": "citizen@ewaste.com",
-    "password": "$2a$10$Z70cnD7xnA56QK6P2a5OluCGT8Bgf0TJTLToBkPvle0pux.WDc8BO",
+    "password": "$2a$10$PNPOQDR.cx9//rdXLIPxCOBr4F8L7I2D9dD38tnYs4KDmps5UEIu6",
     "role": "citizen",
     "ecoPoints": 120,
-    "createdAt": "2026-07-16T18:22:12.972Z"
+    "createdAt": "2026-07-21T17:41:11.742Z"
   }
 ]

@@ -22,18 +22,46 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/pickups', require('./routes/pickups'));
 app.use('/api/centers', require('./routes/centers'));
 
-// Root Endpoint
-app.get('/', (req, res) => {
-  res.json({ message: 'E-Waste Collection API is running...', databaseMode: global.dbMode });
+// Live Global Statistics Endpoint
+app.get('/api/stats', async (req, res) => {
+  try {
+    const allRequests = await PickupRequest.find({});
+    const allCenters = await Center.find({});
+
+    const totalWeightRecycled = allRequests
+      .filter(r => r.status === 'recycled')
+      .reduce((acc, r) => acc + (r.weight || 0), 0);
+
+    const totalPointsAwarded = allRequests
+      .reduce((acc, r) => acc + (r.pointsAwarded || 0), 0);
+
+    const completedPickups = allRequests
+      .filter(r => r.status === 'collected' || r.status === 'recycled').length;
+
+    res.json({
+      totalWeightRecycled,
+      totalPickups: allRequests.length,
+      completedPickups,
+      totalPointsAwarded,
+      activeCenters: allCenters.length
+    });
+  } catch (err) {
+    console.error('Error fetching stats:', err);
+    res.status(500).json({ msg: 'Server error' });
+  }
 });
 
-// Seed Database Function
-async function seedDatabase() {
+// Root Endpoint
+app.get('/', (req, res) => {
+  res.json({ message: 'E-Waste Collection API is running in production mode...', databaseMode: global.dbMode });
+});
+
+// Seed Initial Setup (Centers and Initial Admin only)
+async function seedInitialSetup() {
   try {
-    // 1. Seed Centers
+    // Seed Collection Centers if none exist
     const centers = await Center.find({});
     if (centers.length === 0) {
-      console.log('Seeding collection centers...');
       const seedCenters = [
         {
           name: 'GreenTech Recycling Hub',
@@ -61,81 +89,31 @@ async function seedDatabase() {
       for (const c of seedCenters) {
         await Center.create(c);
       }
-      console.log('Collection centers seeded successfully.');
     }
 
-    // 2. Seed Admin & Citizen Users
-    const adminUser = await User.findOne({ email: 'admin@ewaste.com' });
-    let adminId, citizenId;
-
+    // Seed default system admin account if no admin exists
+    const adminUser = await User.findOne({ role: 'admin' });
     if (!adminUser) {
-      console.log('Seeding admin user...');
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash('admin123', salt);
-      const newAdmin = await User.create({
+      await User.create({
         name: 'Eco Admin',
         email: 'admin@ewaste.com',
         password: hashedPassword,
         role: 'admin',
         ecoPoints: 0
       });
-      adminId = newAdmin._id;
-      console.log('Admin user seeded (admin@ewaste.com / admin123)');
-    } else {
-      adminId = adminUser._id;
-    }
-
-    const citizenUser = await User.findOne({ email: 'citizen@ewaste.com' });
-    if (!citizenUser) {
-      console.log('Seeding citizen user...');
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash('citizen123', salt);
-      const newCitizen = await User.create({
-        name: 'John Doe',
-        email: 'citizen@ewaste.com',
-        password: hashedPassword,
-        role: 'citizen',
-        ecoPoints: 120
-      });
-      citizenId = newCitizen._id;
-      console.log('Citizen user seeded (citizen@ewaste.com / citizen123)');
-
-      // Seed a few pickup requests for the citizen to show on dashboard immediately
-      console.log('Seeding initial pickup requests...');
-      await PickupRequest.create({
-        user: citizenId,
-        userName: 'John Doe',
-        category: 'Mobile Phones',
-        description: 'Old cracked smartphone and charger',
-        weight: 1.5,
-        address: 'House No. 45, Green Lane, Kochi',
-        pickupDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
-        status: 'pending',
-        pointsAwarded: 0
-      });
-
-      await PickupRequest.create({
-        user: citizenId,
-        userName: 'John Doe',
-        category: 'Computers',
-        description: 'Broken desktop tower and keyboard',
-        weight: 12.0,
-        address: 'House No. 45, Green Lane, Kochi',
-        pickupDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
-        status: 'recycled',
-        pointsAwarded: 120
-      });
-      console.log('Initial pickup requests seeded.');
+      console.log('System Admin account created (admin@ewaste.com / admin123)');
     }
   } catch (err) {
-    console.error('Error seeding database:', err.message);
+    console.error('Error during initial setup:', err.message);
   }
 }
 
 const PORT = process.env.PORT || 5000;
 
 connectDB().then(() => {
-  seedDatabase().then(() => {
+  seedInitialSetup().then(() => {
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT} in ${global.dbMode} database mode.`);
     });

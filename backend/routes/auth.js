@@ -110,4 +110,31 @@ router.get('/user', auth, async (req, res) => {
   }
 });
 
+// @route   POST api/auth/redeem
+// @desc    Redeem points for user
+// @access  Private
+router.post('/redeem', auth, async (req, res) => {
+  const { points } = req.body;
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+
+    if ((user.ecoPoints || 0) < points) {
+      return res.status(400).json({ msg: 'Insufficient points balance' });
+    }
+
+    user.ecoPoints = (user.ecoPoints || 0) - points;
+    await user.save();
+
+    const userCopy = { ...user };
+    delete userCopy.password;
+    res.json(userCopy);
+  } catch (err) {
+    console.error('Redeem points error:', err.message);
+    res.status(500).send('Server error');
+  }
+});
+
 module.exports = router;
